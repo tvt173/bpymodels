@@ -3,6 +3,8 @@ import bmesh
 import math
 import numpy as np
 from mathutils import Matrix
+import shapely.geometry as sg
+import shapely.ops as so
 
 def draw_profile(thickness = 5.0,
                 inner_height = 40.0,
@@ -28,7 +30,12 @@ def draw_profile(thickness = 5.0,
         [depth, 0],
         [0, 0],
     ])
-    return points
+    arm_pc = (arm_p1 + arm_p2) * 0.5
+    p_center = sg.Point(arm_pc)
+    circle = p_center.buffer(thickness / 2)
+    poly = sg.Polygon(points)
+    union: sg.Polygon = so.unary_union([circle, poly])
+    return np.array(union.exterior.coords)
 
 def extrude_cs(points, extrude_height):
     n_points = points.shape[0]
