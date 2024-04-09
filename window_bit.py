@@ -26,9 +26,13 @@ def draw_profile(thickness = 5.0,
     x_sin = theta * 5 / np.pi
     sin_inner = np.stack([x_sin, y_sin], axis=1)
     sin_inner = sin_inner[::-1]
-    y_sin_outer = y_sin - 1.5
-    sin_outer_incl = (y_sin_outer < -5) | (theta > np.pi/2)
-    sin_outer = np.stack([x_sin, y_sin_outer], axis=1)[sin_outer_incl]
+    sin_inner_ls = sg.LineString(sin_inner)
+    sin_outer_ls = sin_inner_ls.offset_curve(1)
+    sin_outer = np.array(sin_outer_ls.coords)[::-1]
+    # y_sin_outer = y_sin - 1.5
+    sin_outer_incl = (sin_outer[:, 1] < -5) | (sin_outer[:, 0] > 2.5)
+    sin_outer = sin_outer[sin_outer_incl, :]
+    # sin_outer = np.stack([x_sin, y_sin_outer], axis=1)[sin_outer_incl]
     points = np.vstack([sin_inner, points, sin_outer])
     # sin_curve = sg.LineString(np.stack([x_sin, y_sin], axis=1))
     # sin_poly = sin_curve.buffer(0.5)
